@@ -1,0 +1,170 @@
+ 
+ CREATE SCHEMA QUESERA;
+ 
+ USE QUESERA;
+ 
+ /* Se crea la tabla clientes que tendra los datos de todos los clientes que realicen compra en la quesera*/
+CREATE TABLE QUESERA.CLIENTE
+ (
+ ID_CLIENTE INT AUTO_INCREMENT ,
+ DNI_CLI INT NOT NULL,
+ NOMBRE_CLI VARCHAR (30) ,
+ APELLIDO_CLI VARCHAR (30) ,
+ DIRECCION_CLI VARCHAR (50) ,
+ TELEFONO_CLI VARCHAR (15) ,
+ CORREO_CLI VARCHAR (40) ,
+ COD_POST_CLI INT ,
+ PRIMARY KEY (ID_CLIENTE)
+ );
+
+/* Se crea la tabla PROVEEDOR que tendra los datos de todos los proveedores alos cuales se le realizaran compras de de los materiales
+y materias primas que requiera la quesera para producir sus productos o los servicios necesarios para ello*/
+  CREATE TABLE QUESERA.PROVEEDOR
+ (
+ ID_PROVEEDOR INT AUTO_INCREMENT ,
+ CUIT_PROV VARCHAR (15) NOT NULL,
+ NOMBRE_PROV VARCHAR (30),
+ DIRECCION_PROV VARCHAR (50),
+ TELEFONO_PROV VARCHAR (15),
+ CORREO_PROV VARCHAR (40),
+ COD_POST_PROV INT ,
+ CONTACTO_PROV VARCHAR (30),
+ PRIMARY KEY (ID_PROVEEDOR)
+ );
+ 
+ /* Se crea la tabla TIPO_ALMACEN en la que se describira el tipo de almacen que tendra la quesera
+ para almacenar, materias primas, productos terminados o elementos necesarios para el proceso productivo*/
+  CREATE TABLE QUESERA.TIPO_ALMACEN
+ (
+ ID_TIPO_ALMACEN INT AUTO_INCREMENT,
+ TIPO_ALMACEN VARCHAR (30),
+ DETALLE_ALMACEN VARCHAR (50),
+ PRIMARY KEY (ID_TIPO_ALMACEN)
+ );
+ 
+ /* Se crea la tabla ALMACEN que tendra los datos de los almacenes y algunas caracteristicas
+ principales de estos en la quesera*/
+   CREATE TABLE QUESERA.ALMACEN
+ (
+ ID_ALMACEN INT AUTO_INCREMENT,
+ NOMBRE_ALMACEN VARCHAR (30),
+ AREA_ALMACEN VARCHAR (30),
+ VOLUMEN_ALMACEN INT,
+ TEMP_ALMACENINT INT,
+ ID_TIPO_ALMACEN INT,
+ PRIMARY KEY (ID_ALMACEN),
+ FOREIGN KEY (ID_TIPO_ALMACEN) REFERENCES QUESERA.TIPO_ALMACEN (ID_TIPO_ALMACEN)
+ );
+ 
+ /* Se crea la tabla TIPO_MATERIA_PRIMA que tendra los datos de las diferentes materias primas que se utilizan en el proceso
+ de produccion de los productos en la quesera*/
+  CREATE TABLE QUESERA.TIPO_MATERIA_PRIMA
+ (
+ ID_TIPO_MATERIA INT AUTO_INCREMENT,
+ TIPO_MATERIA VARCHAR (30),
+ DESCRIP_TIPO_MATERIA VARCHAR (50),
+ PROVEEDOR_MATERIA VARCHAR (30),
+ CANT_TIPO_MATERIA INT,
+ LOTE_TIPO_MATERIA VARCHAR (15),
+ PRIMARY KEY (ID_TIPO_MATERIA)
+  );
+ 
+ /* Se crea la tabla TIPO_PRODUCTO que tendra los datos de los de identificacion de los diferentes productos que se 
+ venden en la quesera, sin importar si se producen o no en ella*/
+  CREATE TABLE QUESERA.TIPO_PRODUCTO
+ (
+ ID_TIPO_PRODUCTO INT AUTO_INCREMENT,
+ TIPO_PRODUCTO VARCHAR (30),
+ DETALLES VARCHAR (50),
+ CANTIDAD_TP INT,
+ PRIMARY KEY (ID_TIPO_PRODUCTO)
+ );
+ 
+  /* Se crea la tabla PRODUCTO_TERMINADO que tendra los datos de los diferentes productos que se producen y venden en la quesera*/
+  CREATE TABLE QUESERA.PRODUCTO_TERMINADO
+ (
+ ID_PRODUCTOS INT AUTO_INCREMENT,
+ NOMBRE_PRODUCTO VARCHAR (30),
+ STOCK_ACTUAL INT,
+ STOCK_MINIMO INT,
+ STOCK_MAXIMO INT,
+ PRECIO FLOAT (8),
+ ID_TIPO_PRODUCTO INT,
+ ID_ALMACEN INT,
+ PRIMARY KEY (ID_PRODUCTOS),
+ FOREIGN KEY (ID_ALMACEN) REFERENCES QUESERA.ALMACEN (ID_ALMACEN),
+ FOREIGN KEY (ID_TIPO_PRODUCTO) REFERENCES QUESERA.TIPO_PRODUCTO (ID_TIPO_PRODUCTO)
+ );
+ 
+  /* Se crea la tabla MATERIA_PRIMA que tendra los datos de los diferentes materias primas que se utilizan para la produccion
+  en la quesera*/
+  CREATE TABLE QUESERA.MATERIA_PRIMA
+ (
+ ID_MATERIA INT AUTO_INCREMENT,
+ MATERIA VARCHAR (30),
+ DESCRIP_MATERIA VARCHAR (50),
+ ID_ALMACEN INT,
+ ID_TIPO_MATERIA INT,
+ CANT_MATERIA INT,
+ LOTE_MATERIA VARCHAR (15),
+ ID_PROVEEDOR INT,
+ PRIMARY KEY (ID_MATERIA),
+ FOREIGN KEY (ID_TIPO_MATERIA) REFERENCES QUESERA.TIPO_MATERIA_PRIMA (ID_TIPO_MATERIA),
+ FOREIGN KEY (ID_ALMACEN) REFERENCES QUESERA.ALMACEN (ID_ALMACEN),
+ FOREIGN KEY (ID_PROVEEDOR) REFERENCES QUESERA.PROVEEDOR (ID_PROVEEDOR)
+ );
+ 
+  /* Se crea la tabla PRODUCCION que tendra los datos de los partes u ordenes de produccion que se creen para la elaboracion de los 
+  diferentes productos que realiza y venden en la quesera*/
+ CREATE TABLE QUESERA.PRODUCCION
+ (
+ ID_PRODUCCION INT AUTO_INCREMENT,
+ ID_PRODUCTOS INT ,
+ FECHA_INICIO DATE,
+ FECHA_CADUCA DATE,
+ CANTIDAD_PROD INT ,
+ NUM_LOTE VARCHAR (15),
+ PRIMARY KEY (ID_PRODUCCION),
+ FOREIGN KEY (ID_PRODUCTOS) REFERENCES QUESERA.PRODUCTO_TERMINADO (ID_PRODUCTOS)
+ );
+ 
+  /* Se crea la tabla DETALLE_PRODUCCION que tendra los datos mas importantes y detallados de las ordenes que se generen para 
+  la produccion en la quesera*/
+ CREATE TABLE QUESERA.DETALLE_PRODUCCION
+ (
+ ID_DETALLE_PROD INT AUTO_INCREMENT,
+ ID_MATERIA INT,
+ ID_PRODUCCION INT,
+ CANTIDAD_TP INT,
+ ID_PRODUCTOS INT ,
+ PRIMARY KEY (ID_DETALLE_PROD),
+ FOREIGN KEY (ID_MATERIA) REFERENCES QUESERA.MATERIA_PRIMA (ID_MATERIA),
+ FOREIGN KEY (ID_PRODUCCION) REFERENCES QUESERA.PRODUCCION (ID_PRODUCCION),
+ FOREIGN KEY (ID_PRODUCTOS) REFERENCES QUESERA.PRODUCTO_TERMINADO (ID_PRODUCTOS)
+ );
+
+/* Se crea la tabla PRODCLI que tendra los datos claves para relacionar las tablas de CLIENTES con los
+  PRODUCTOS TERMINADOS de la tabla en la quesera*/
+CREATE TABLE QUESERA.PRODUCTO_CLIENTES
+(
+ID_PRODCLI INT AUTO_INCREMENT,
+ID_CLIENTE INT ,
+ID_PRODUCTOS INT,
+CANTIDAD_PROD INT,
+PRIMARY KEY (ID_PRODCLI),
+FOREIGN KEY (ID_CLIENTE) REFERENCES QUESERA.CLIENTE (ID_CLIENTE),
+FOREIGN KEY (ID_PRODUCTOS) REFERENCES QUESERA.PRODUCTO_TERMINADO (ID_PRODUCTOS)
+);
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+  
